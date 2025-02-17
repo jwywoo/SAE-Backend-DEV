@@ -1,6 +1,7 @@
 package com.example.saebackenddev.domain.member.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -28,14 +29,14 @@ public class MemberEntity {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
-    private Set<Role> roles;
+    @NotNull
+    private Role role;
 
-    public MemberEntity(String username, String password, String email, Set<Role> role) {
+    public MemberEntity(String username, String password, String email, Role role) {
         this.username = username;
         this.password = password;
         this.email = email;
-        this.roles = role;
+        this.role = role;
     }
 }

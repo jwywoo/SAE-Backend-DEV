@@ -36,11 +36,11 @@ public class MemberService {
                 .username(requestDto.getUsername())
                 .email(requestDto.getEmail())
                 .password(encodedPassword)
-                .roles(Set.of(Role.USER))
+                .role(Role.USER)
                 .build();
 
         memberRepository.save(newUser);
 
-        return new SignupResponseDto(newUser.getUsername(), newUser.getEmail(), newUser.getRoles());
+        return new SignupResponseDto(newUser.getUsername(), newUser.getEmail(), newUser.getRole());
     }
 }

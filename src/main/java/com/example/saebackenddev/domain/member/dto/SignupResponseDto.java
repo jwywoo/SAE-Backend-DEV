@@ -9,11 +9,11 @@ import java.util.Set;
 public class SignupResponseDto {
     private final String username;
     private final String email;
-    private final Set<Role> roles;
+    private final Role role;
 
-    public SignupResponseDto(String username, String email, Set<Role> roles) {
+    public SignupResponseDto(String username, String email, Role role) {
         this.username = username;
         this.email = email;
-        this.roles = roles;
+        this.role = role;
     }
 }
