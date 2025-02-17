@@ -1,9 +1,8 @@
 package com.example.saebackenddev.domain.member.config;
 
 import com.example.saebackenddev.domain.member.jwt.JwtUtil;
-import com.example.saebackenddev.domain.member.security.JwtAuthenticationFilter;
-import com.example.saebackenddev.domain.member.security.JwtAuthorizationFilter;
-import com.example.saebackenddev.domain.member.security.UserDetailsServiceImpl;
+import com.example.saebackenddev.domain.member.security.*;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -34,6 +33,8 @@ public class WebSecurityConfig implements WebMvcConfigurer {
     private final JwtUtil jwtUtil;
     private final UserDetailsServiceImpl userDetailsService;
     private final AuthenticationConfiguration authenticationConfiguration;
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final CustomOAuth2SuccessHandler customOAuth2SuccessHandler;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -83,19 +84,21 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.cors((cors) -> cors.configurationSource(configurationSource()));
-        http.csrf((csrf) -> csrf.disable());
-        http.sessionManagement((sessionManagement) -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-
-        http.authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
-                .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                .requestMatchers("/api/users/signup", "/api/users/login").permitAll()
-                .requestMatchers("/api/token/**").permitAll()
-                .requestMatchers(HttpMethod.GET).permitAll()
-                .anyRequest().authenticated()
-        );
-
+        http.cors(cors -> cors.configurationSource(configurationSource()))
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/api/users/signup", "/api/users/login").permitAll()
+                        .requestMatchers("/api/token/**").permitAll()
+                        .requestMatchers(HttpMethod.GET).permitAll()
+                        .anyRequest().authenticated()
+                )
+                .oauth2Login(oauth2 -> oauth2
+                        .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
+                        .successHandler(customOAuth2SuccessHandler) // Use success handler
+                );
         http.addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
