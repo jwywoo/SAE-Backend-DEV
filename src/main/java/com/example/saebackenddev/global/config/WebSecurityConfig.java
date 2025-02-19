@@ -2,6 +2,7 @@ package com.example.saebackenddev.global.config;
 
 import com.example.saebackenddev.global.jwt.JwtUtil;
 import com.example.saebackenddev.global.security.JwtAuthorizationFilter;
+import com.example.saebackenddev.global.security.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.context.annotation.Bean;
@@ -26,6 +27,7 @@ import java.util.Arrays;
 public class WebSecurityConfig implements WebMvcConfigurer {
 
     private final JwtUtil jwtUtil;
+    private final UserDetailsServiceImpl userDetailsService;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
@@ -34,7 +36,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 
     @Bean
     public JwtAuthorizationFilter jwtAuthorizationFilter() {
-        return new JwtAuthorizationFilter(jwtUtil);
+        return new JwtAuthorizationFilter(jwtUtil, userDetailsService);
     }
 
     @Override
