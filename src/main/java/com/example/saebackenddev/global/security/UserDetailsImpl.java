@@ -10,14 +10,14 @@ import java.util.Collections;
 
 @Getter
 public class UserDetailsImpl implements UserDetails {
-    private final String username;
-    private final String googleId;
-    private final String email;
+    private final MemberEntity member;
 
     public UserDetailsImpl(MemberEntity member) {
-        this.username = member.getUsername();
-        this.googleId = member.getGoogleId();
-        this.email = member.getEmail();
+        this.member = member;
+    }
+
+    public MemberEntity getMember(){
+        return member;
     }
 
     @Override
@@ -32,7 +32,7 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public String getUsername() {
-        return username;
+        return member.getUsername();
     }
 
     @Override

@@ -13,6 +13,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -23,6 +24,7 @@ import java.io.PrintWriter;
 @RequiredArgsConstructor
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
+    private final UserDetailsServiceImpl userDetailsService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain filterChain) throws ServletException, IOException {
@@ -49,10 +51,16 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     }
 
     private void setAuthentication(String username) {
+        log.info("setAuthentication's username: {}", username);
         SecurityContext context = SecurityContextHolder.createEmptyContext();
-        Authentication authentication = new UsernamePasswordAuthenticationToken(username, null, null);
+        Authentication authentication = createAuthentication(username);
         context.setAuthentication(authentication);
         SecurityContextHolder.setContext(context);
+    }
+
+    private Authentication createAuthentication(String username) {
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }
 
     private void writeResponse(HttpServletResponse response, String message) {
