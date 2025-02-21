@@ -5,6 +5,7 @@ import com.example.saebackenddev.domain.member.auth.service.GoogleOAuthService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -34,7 +35,8 @@ public class MemberAuthController {
     }
 
     @GetMapping("/google/callback")
-    public LoginResponseDto googleLogin(@RequestParam String code, HttpServletResponse response) {
-        return googleOAuthService.googleLogin(code, response);
+    public ResponseEntity<LoginResponseDto> googleLogin(@RequestParam String code, HttpServletResponse response) throws IOException {
+        LoginResponseDto responseDto = googleOAuthService.googleLogin(code, response);
+        return ResponseEntity.ok().body(responseDto);
     }
 }
